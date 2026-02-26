@@ -1,0 +1,123 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GRID | Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'dashboard.css' %}" />
+</head>
+<body>
+  <div class="dashboard-bg orb-one"></div>
+  <div class="dashboard-bg orb-two"></div>
+
+  <header class="dashboard-header">
+    <div class="brand">GRID</div>
+    <nav class="nav-links">
+      <a href="{% url 'auth_page' %}">Auth</a>
+      <a href="{% url 'landing_page' %}">Home</a>
+      <a class="secondary" href="#">Help</a>
+    </nav>
+    <button class="btn-square">Upload</button>
+  </header>
+
+  <main class="dashboard">
+    <section class="panel hero-panel">
+      <div>
+        <p class="eyebrow">Private Cloud Dashboard</p>
+        <h1>Live activity, secure uploads, no distractions.</h1>
+        <p>Track your uploads, share links, and monitor the sync queue in one clean space.</p>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <p class="stat-label">Storage used</p>
+          <strong>28.3 GB</strong>
+        </div>
+        <div>
+          <p class="stat-label">Recent activity</p>
+          <strong>7 items</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel cards">
+      <article>
+        <p class="card-label">Uploads complete</p>
+        <h3>128</h3>
+        <p>Synced across devices in the last 24h.</p>
+      </article>
+      <article>
+        <p class="card-label">Links ready</p>
+        <h3>42</h3>
+        <p>Expiring URLs still in circulation.</p>
+      </article>
+      <article>
+        <p class="card-label">Security</p>
+        <h3>256-bit</h3>
+        <p>Every file encrypted by default.</p>
+      </article>
+    </section>
+
+    <section class="panel upload-area">
+      <div class="panel-head">
+        <h2>Upload data</h2>
+        <p>Drop metadata manually for testing before the full uploader is wired up.</p>
+      </div>
+      <form class="upload-form">
+        <label>
+          <span>Title</span>
+          <input type="text" placeholder="designs.zip" />
+        </label>
+        <label>
+          <span>Type</span>
+          <input type="text" placeholder="Archive, Photo, Doc..." />
+        </label>
+        <label>
+          <span>Visibility</span>
+          <select>
+            <option>Private</option>
+            <option>Team share</option>
+            <option>Public link</option>
+          </select>
+        </label>
+        <label>
+          <span>Notes</span>
+          <textarea rows="3" placeholder="Quick summary or reminder"></textarea>
+        </label>
+        <button class="btn-primary" type="button">Stage upload</button>
+      </form>
+    </section>
+
+    <section class="panel uploads-list">
+      <div class="panel-head">
+        <h2>Recent uploads</h2>
+        <p>Visible to you only.</p>
+      </div>
+      <div class="upload-row">
+        <div>
+          <p class="label">designs_v2.psd</p>
+          <p class="sub">Photos · Private · Synced 3 minutes ago</p>
+        </div>
+        <span class="status success">Synced</span>
+      </div>
+      <div class="upload-row">
+        <div>
+          <p class="label">backup_dec23.zip</p>
+          <p class="sub">Archive · Team share · Pending transfer</p>
+        </div>
+        <span class="status warning">Queued</span>
+      </div>
+      <div class="upload-row">
+        <div>
+          <p class="label">notes.pdf</p>
+          <p class="sub">Doc · Private · Synced 18 minutes ago</p>
+        </div>
+        <span class="status success">Synced</span>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

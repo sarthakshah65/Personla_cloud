@@ -365,7 +365,13 @@
           <input type="hidden" name="form_type" value="login" />
           {% csrf_token %}
           <button class="action" type="submit">Sign In</button>
-          <p id="login-status" class="api-status" aria-live="polite"></p>
+          <p
+            id="login-status"
+            class="api-status {% if login_status == 'error' %}error{% elif login_status == 'success' %}success{% endif %}"
+            aria-live="polite"
+          >
+            {% if login_message %}{{ login_message }}{% endif %}
+          </p>
           <p class="hint">No account? <a href="#" onclick="document.getElementById('tab-signup').checked=true; return false;">Create one</a></p>
         </form>
 
@@ -407,6 +413,6 @@
       </div>
     </section>
   </main>
-  <script src="auth.js"></script>
+
 </body>
 </html>
