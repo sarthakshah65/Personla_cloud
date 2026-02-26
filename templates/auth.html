@@ -344,7 +344,7 @@
       </div>
 
       <div class="forms">
-        <form id="login-form" class="auth-form login-form" action="#" method="post" novalidate>
+        <form id="login-form" class="auth-form login-form" action="{% url 'auth_page' %}" method="post" novalidate>
           <div>
             <label class="field-label" for="login-email">Email</label>
             <input class="input" id="login-email" name="email" type="email" placeholder="you@example.com" required />
@@ -362,12 +362,14 @@
             <a href="#">Forgot password?</a>
           </div>
 
+          <input type="hidden" name="form_type" value="login" />
+          {% csrf_token %}
           <button class="action" type="submit">Sign In</button>
           <p id="login-status" class="api-status" aria-live="polite"></p>
           <p class="hint">No account? <a href="#" onclick="document.getElementById('tab-signup').checked=true; return false;">Create one</a></p>
         </form>
 
-        <form id="signup-form" class="auth-form signup-form" action="#" method="post" novalidate>
+        <form id="signup-form" class="auth-form signup-form" action="{% url 'auth_page' %}" method="post" novalidate>
           <div>
             <label class="field-label" for="signup-name">Full Name</label>
             <input class="input" id="signup-name" name="full_name" type="text" placeholder="Your name" minlength="2" required />
@@ -390,8 +392,16 @@
             <label class="check"><input type="checkbox" name="terms" required /> I agree to the Terms</label>
           </div>
 
+          <input type="hidden" name="form_type" value="signup" />
+          {% csrf_token %}
           <button class="action" type="submit">Create Account</button>
-          <p id="signup-status" class="api-status" aria-live="polite"></p>
+          <p
+            id="signup-status"
+            class="api-status {% if signup_status == 'error' %}error{% elif signup_status == 'success' %}success{% endif %}"
+            aria-live="polite"
+          >
+            {% if signup_message %}{{ signup_message }}{% endif %}
+          </p>
           <p class="hint">Already registered? <a href="#" onclick="document.getElementById('tab-login').checked=true; return false;">Login</a></p>
         </form>
       </div>

@@ -1,14 +1,47 @@
-from django.shortcuts import render,redirect,get_object_or_404
-#import django.contrib.auth as auth
-#from django.contrib.auth.models import User
-#from django.contrib import messages
-#from .models import chatRoom,Messages,FriendsList,RequestList
-#import string,random,json
-# Create your views here.
+from django.contrib.auth.hashers import make_password
+from django.db import IntegrityError
+from django.shortcuts import render
+
+from .models import Account
+
 
 def landing_page(request):
-    return render(request,'index.html')
+    return render(request, "index.html")
 
 
 def auth_page(request):
-    return render(request, 'auth.html')
+    context = {}
+
+    if request.method == "POST":
+        form_type = request.POST.get("form_type")
+        if form_type == "signup":
+            full_name = request.POST.get("full_name", "").strip()
+            email = request.POST.get("email", "").strip().lower()
+            password = request.POST.get("password", "")
+
+            errors = []
+
+            if len(full_name) < 2:
+                errors.append("Full name must be at least 2 characters.")
+            if not email:
+                errors.append("Email is required.")
+            if len(password) < 8:
+                errors.append("Password must be at least 8 characters.")
+
+            if not errors:
+                try:
+                    Account.objects.create(
+                        full_name=full_name,
+                        email=email,
+                        password=make_password(password),
+                    )
+                    context["signup_status"] = "success"
+                    context["signup_message"] = "Account created. You can sign in now."
+                except IntegrityError:
+                    context["signup_status"] = "error"
+                    context["signup_message"] = "An account with that email already exists."
+            else:
+                context["signup_status"] = "error"
+                context["signup_message"] = " ".join(errors)
+
+    return render(request, "auth.html", context)
