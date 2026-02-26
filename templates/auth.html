@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GRID | Authentication</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #08141e;
+      --panel: #102434;
+      --panel-soft: #163248;
+      --text: #e8f4ff;
+      --muted: #aac8de;
+      --accent: #42d6ff;
+      --accent-2: #90ff9f;
+      --line: #2c4a60;
+      --danger: #ff6f83;
+      --radius: 16px;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Manrope', sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at 10% 15%, #12324c 0%, transparent 38%),
+                  radial-gradient(circle at 85% 20%, #1b3b4f 0%, transparent 40%),
+                  var(--bg);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .orb {
+      position: fixed;
+      z-index: -1;
+      width: 280px;
+      height: 280px;
+      border-radius: 999px;
+      filter: blur(70px);
+      opacity: 0.7;
+    }
+
+    .orb.one { top: -90px; left: -90px; background: rgba(66, 214, 255, 0.2); }
+    .orb.two { bottom: -90px; right: -70px; background: rgba(144, 255, 159, 0.18); }
+
+    .auth-shell {
+      width: min(940px, 100%);
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      border-radius: calc(var(--radius) + 8px);
+      overflow: hidden;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      background: linear-gradient(180deg, #0d2030, #0c1c2b);
+    }
+
+    .brand-panel {
+      padding: 44px 38px;
+      background: linear-gradient(160deg, #0f2a3d 0%, #15374f 60%, #10344d 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.26rem;
+      font-size: 1.25rem;
+      color: #c6eeff;
+    }
+
+    .brand-panel h1 {
+      margin: 10px 0 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.75rem, 4vw, 2.35rem);
+      line-height: 1.08;
+    }
+
+    .brand-panel p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      max-width: 34ch;
+    }
+
+    .trust {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .trust span {
+      border: 1px solid rgba(232, 244, 255, 0.2);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      color: #d7f4ff;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .form-panel {
+      padding: 34px;
+      background: linear-gradient(180deg, var(--panel), var(--panel-soft));
+      position: relative;
+    }
+
+    .panel-head {
+      margin-bottom: 18px;
+    }
+
+    .panel-head h2 {
+      margin: 0 0 6px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+    }
+
+    .panel-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .auth-tab {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .tab-strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 18px;
+    }
+
+    .tab-strip > label {
+      text-align: center;
+      padding: 9px 10px;
+      border-radius: 9px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      transition: 180ms ease;
+      user-select: none;
+    }
+
+    #tab-login:checked ~ .tab-strip .tab-label-login,
+    #tab-signup:checked ~ .tab-strip .tab-label-signup {
+      background: linear-gradient(120deg, var(--accent), #78f2ff);
+      color: #072433;
+    }
+
+    .forms {
+      position: relative;
+      min-height: 385px;
+    }
+
+    .auth-form {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 180ms ease, transform 180ms ease;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    #tab-login:checked ~ .forms .login-form,
+    #tab-signup:checked ~ .forms .signup-form {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    label.field-label {
+      font-size: 0.86rem;
+      color: #d0e7f8;
+      font-weight: 600;
+      margin-bottom: 3px;
+      display: inline-block;
+    }
+
+    .input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text);
+      padding: 12px 13px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .input::placeholder { color: #88a8be; }
+
+    .input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(66, 214, 255, 0.18);
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin: 2px 0 6px;
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+
+    .row a {
+      color: #c2f8ff;
+      text-decoration: none;
+    }
+
+    .row a:hover { text-decoration: underline; }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .action {
+      margin-top: 2px;
+      border: 0;
+      border-radius: 12px;
+      padding: 12px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #03202e;
+      cursor: pointer;
+      background: linear-gradient(120deg, var(--accent), #7af8ff);
+      transition: transform 140ms ease, filter 140ms ease;
+    }
+
+    .action:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    .hint {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    .hint a {
+      color: var(--accent-2);
+      text-decoration: none;
+    }
+
+    .hint a:hover { text-decoration: underline; }
+
+    .api-status {
+      min-height: 1.1em;
+      margin: 4px 0 0;
+      font-size: 0.84rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .api-status.error {
+      color: var(--danger);
+    }
+
+    .api-status.success {
+      color: var(--accent-2);
+    }
+
+    .error-demo {
+      color: var(--danger);
+      font-size: 0.8rem;
+      display: none;
+    }
+
+    .input:invalid:not(:placeholder-shown) + .error-demo {
+      display: block;
+    }
+
+    @media (max-width: 860px) {
+      .auth-shell { grid-template-columns: 1fr; }
+      .brand-panel { padding: 28px 26px 24px; }
+      .form-panel { padding: 26px; }
+      .forms { min-height: 410px; }
+    }
+
+    @media (max-width: 440px) {
+      body { padding: 12px; }
+      .brand-panel, .form-panel { padding: 20px; }
+      .tab-strip > label { font-size: 0.9rem; }
+      .forms { min-height: 435px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="orb one"></div>
+  <div class="orb two"></div>
+
+  <main class="auth-shell">
+    <section class="brand-panel">
+      <div>
+        <a href="{% url 'landing_page' %}" class="brand">GRID</a>
+        <h1>Secure access to your personal cloud.</h1>
+        <p>Sign in to manage files, backups, and private links. New here? Create an account in under a minute.</p>
+      </div>
+      <div class="trust">
+        <span>256-bit encryption</span>
+        <span>Private by default</span>
+        <span>Cross-device sync</span>
+      </div>
+    </section>
+
+    <section class="form-panel">
+      <div class="panel-head">
+        <h2>Welcome</h2>
+        <p>Use your email to sign in or create an account.</p>
+        <p><a href="{% url 'landing_page' %}" style="color:#c2f8ff;text-decoration:none;">Back to home</a></p>
+      </div>
+
+      <input checked id="tab-login" class="auth-tab" name="auth-tab" type="radio" />
+      <input id="tab-signup" class="auth-tab" name="auth-tab" type="radio" />
+
+      <div class="tab-strip">
+        <label for="tab-login" class="tab-label-login">Login</label>
+        <label for="tab-signup" class="tab-label-signup">Sign Up</label>
+      </div>
+
+      <div class="forms">
+        <form id="login-form" class="auth-form login-form" action="#" method="post" novalidate>
+          <div>
+            <label class="field-label" for="login-email">Email</label>
+            <input class="input" id="login-email" name="email" type="email" placeholder="you@example.com" required />
+            <span class="error-demo">Enter a valid email address.</span>
+          </div>
+
+          <div>
+            <label class="field-label" for="login-password">Password</label>
+            <input class="input" id="login-password" name="password" type="password" placeholder="Enter password" minlength="8" required />
+            <span class="error-demo">Password must be at least 8 characters.</span>
+          </div>
+
+          <div class="row">
+            <label class="check"><input type="checkbox" name="remember" /> Remember me</label>
+            <a href="#">Forgot password?</a>
+          </div>
+
+          <button class="action" type="submit">Sign In</button>
+          <p id="login-status" class="api-status" aria-live="polite"></p>
+          <p class="hint">No account? <a href="#" onclick="document.getElementById('tab-signup').checked=true; return false;">Create one</a></p>
+        </form>
+
+        <form id="signup-form" class="auth-form signup-form" action="#" method="post" novalidate>
+          <div>
+            <label class="field-label" for="signup-name">Full Name</label>
+            <input class="input" id="signup-name" name="full_name" type="text" placeholder="Your name" minlength="2" required />
+            <span class="error-demo">Name must contain at least 2 characters.</span>
+          </div>
+
+          <div>
+            <label class="field-label" for="signup-email">Email</label>
+            <input class="input" id="signup-email" name="email" type="email" placeholder="you@example.com" required />
+            <span class="error-demo">Enter a valid email address.</span>
+          </div>
+
+          <div>
+            <label class="field-label" for="signup-password">Create Password</label>
+            <input class="input" id="signup-password" name="password" type="password" placeholder="Minimum 8 characters" minlength="8" required />
+            <span class="error-demo">Password must be at least 8 characters.</span>
+          </div>
+
+          <div class="row">
+            <label class="check"><input type="checkbox" name="terms" required /> I agree to the Terms</label>
+          </div>
+
+          <button class="action" type="submit">Create Account</button>
+          <p id="signup-status" class="api-status" aria-live="polite"></p>
+          <p class="hint">Already registered? <a href="#" onclick="document.getElementById('tab-login').checked=true; return false;">Login</a></p>
+        </form>
+      </div>
+    </section>
+  </main>
+  <script src="auth.js"></script>
+</body>
+</html>

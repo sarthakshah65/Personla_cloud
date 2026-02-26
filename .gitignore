@@ -1,0 +1,23 @@
+# Python/django common ignores
+__pycache__/
+*.py[cod]
+*$py.class
+# Django specific
+db.sqlite3
+.env
+# IDEs
+.idea/
+.vscode/
+# Logs
+*.log
+# Static/system
+staticfiles/
+media/
+# Virtual environments
+venv/
+env/
+ENV/
+# Coverage and caches
+.pytest_cache/
+htmlcov/
+coverage.*

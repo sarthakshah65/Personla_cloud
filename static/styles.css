@@ -1,0 +1,249 @@
+﻿:root {
+  --bg: #08141e;
+  --panel: #102434;
+  --panel-soft: #163248;
+  --text: #e8f4ff;
+  --muted: #aac8de;
+  --accent: #42d6ff;
+  --accent-2: #90ff9f;
+  --line: #2c4a60;
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Manrope', sans-serif;
+  color: var(--text);
+  background: radial-gradient(circle at 20% 10%, #12324c 0%, transparent 45%),
+              radial-gradient(circle at 90% 20%, #1b3b4f 0%, transparent 40%),
+              var(--bg);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+main {
+  width: min(1100px, 92vw);
+  margin: 0 auto;
+}
+
+.site-header {
+  width: min(1100px, 92vw);
+  margin: 0 auto;
+  padding: 1.4rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 1.28rem;
+  letter-spacing: 0.26rem;
+  background: linear-gradient(120deg, var(--accent), #7af8ff 50%, var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.hero {
+  padding: 4rem 0 3rem;
+  animation: riseIn 700ms ease both;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent-2);
+  font-size: 0.8rem;
+  margin-bottom: 0.9rem;
+}
+
+h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  line-height: 1.02;
+  max-width: 13ch;
+  margin-bottom: 1.2rem;
+}
+
+.hero-copy {
+  max-width: 60ch;
+  color: var(--muted);
+  font-size: 1.08rem;
+  line-height: 1.65;
+  margin-bottom: 1.8rem;
+}
+
+.btn {
+  display: inline-block;
+  text-decoration: none;
+  padding: 0.75rem 1.2rem;
+  border-radius: 0.8rem;
+  font-weight: 700;
+  transition: 200ms ease;
+}
+
+.btn-primary {
+  color: #03202e;
+  background: linear-gradient(120deg, var(--accent), #7af8ff);
+  box-shadow: var(--shadow);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px) scale(1.01);
+}
+
+.btn-ghost {
+  color: var(--text);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.btn-ghost:hover {
+  border-color: var(--accent-2);
+}
+
+.trust-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.trust-row span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 2.6rem 0;
+}
+
+.card {
+  background: linear-gradient(180deg, var(--panel), var(--panel-soft));
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  padding: 1.2rem;
+  box-shadow: var(--shadow);
+}
+
+.card h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+}
+
+.card p {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.personal {
+  margin: 3.2rem 0 4.2rem;
+  background: linear-gradient(180deg, #13344d, #0f2a3d);
+  border: 1px solid #3a5d76;
+  border-radius: 1rem;
+  padding: 1.4rem;
+  max-width: 720px;
+}
+
+.personal h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2.3rem);
+  margin-bottom: 0.9rem;
+}
+
+.personal p {
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 1.1rem;
+}
+
+.site-footer {
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  padding: 1.2rem 4vw 2.2rem;
+  text-align: center;
+}
+
+.bg-orb {
+  position: fixed;
+  border-radius: 999px;
+  filter: blur(60px);
+  z-index: -1;
+}
+
+.orb-a {
+  width: 300px;
+  height: 300px;
+  background: rgba(66, 214, 255, 0.15);
+  top: -90px;
+  left: -80px;
+}
+
+.orb-b {
+  width: 260px;
+  height: 260px;
+  background: rgba(144, 255, 159, 0.12);
+  bottom: -80px;
+  right: -70px;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 520ms ease, transform 520ms ease;
+}
+
+.reveal.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 900px) {
+  .site-header {
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+
+  .features {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding-top: 2.8rem;
+  }
+
+  .personal {
+    max-width: none;
+  }
+}
