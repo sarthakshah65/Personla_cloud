@@ -17,11 +17,14 @@
   <header class="dashboard-header">
     <div class="brand">GRID</div>
     <nav class="nav-links">
-      <a href="{% url 'auth_page' %}">Auth</a>
-      <a href="{% url 'landing_page' %}">Home</a>
-      <a class="secondary" href="#">Help</a>
+      <span class="nav-user">{{ account.full_name }}</span>
+      <a class="nav-link" href="{% url 'landing_page' %}">Home</a>
+      <a class="nav-link secondary" href="#">Help</a>
     </nav>
-    <button class="btn-square">Upload</button>
+    <div class="header-actions">
+      <a class="btn-square secondary" href="{% url 'logout' %}">Log out</a>
+      <button class="btn-square">Upload</button>
+    </div>
   </header>
 
   <main class="dashboard">

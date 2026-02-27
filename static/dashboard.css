@@ -67,16 +67,34 @@ body {
 
 .nav-links {
   display: flex;
+  align-items: center;
   gap: 1rem;
   font-weight: 600;
 }
 
-.nav-links a {
-  color: var(--muted);
+.nav-links a,
+.nav-user {
   transition: color 200ms ease;
 }
 
-.nav-links a:hover {
+.nav-user {
+  color: var(--text);
+  font-weight: 700;
+  border-radius: 0.7rem;
+  padding: 0.35rem 0.85rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.nav-link {
+  color: var(--muted);
+  text-transform: none;
+  font-size: 0.95rem;
+  padding: 0.2rem 0.5rem;
+}
+
+.nav-link:hover,
+.nav-user:hover {
   color: var(--text);
 }
 
@@ -86,15 +104,37 @@ body {
   padding: 0.25rem 0.85rem;
 }
 
-.btn-square {
-  border: none;
-  border-radius: 0.9rem;
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.btn-square,
+.btn-square.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
   padding: 0.8rem 1.4rem;
-  background: linear-gradient(120deg, var(--accent), var(--accent-2));
-  color: #0b1b26;
+  border-radius: 0.9rem;
   font-weight: 700;
   cursor: pointer;
   box-shadow: var(--shadow);
+  border: none;
+}
+
+.btn-square.secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: none;
+  min-width: 100px;
+  padding: 0.6rem 1rem;
+}
+
+.btn-square.secondary:hover {
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .dashboard {

@@ -5,6 +5,12 @@ from django.shortcuts import redirect, render
 from .models import Account
 
 
+def _get_authenticated_account(request):
+    account_id = request.session.get("account_id")
+    if not account_id:
+        return None
+    return Account.objects.filter(pk=account_id).first()
+
 def landing_page(request):
     return render(request, "index.html")
 
@@ -16,6 +22,9 @@ def auth_page(request):
         "signup_status": None,
         "signup_message": "",
     }
+
+    if _get_authenticated_account(request):
+        return redirect("dashboard")
 
     if request.method == "POST":
         form_type = request.POST.get("form_type")
@@ -78,4 +87,12 @@ def auth_page(request):
 
 
 def dashboard(request):
-    return render(request, "dashboard.html")
+    account = _get_authenticated_account(request)
+    if not account:
+        return redirect("auth_page")
+    return render(request, "dashboard.html", {"account": account})
+
+
+def logout_view(request):
+    request.session.pop("account_id", None)
+    return redirect("auth_page")
