@@ -1,8 +1,12 @@
+from datetime import timedelta
+
 from django.contrib.auth.hashers import check_password, make_password
 from django.db import IntegrityError
+from django.db.models import Sum
 from django.shortcuts import redirect, render
+from django.utils import timezone
 
-from .models import Account
+from .models import Account, Upload
 
 
 def _get_authenticated_account(request):
@@ -90,7 +94,33 @@ def dashboard(request):
     account = _get_authenticated_account(request)
     if not account:
         return redirect("auth_page")
-    return render(request, "dashboard.html", {"account": account})
+    uploads = account.uploads.all()
+    total_size_mb = uploads.aggregate(total=Sum("size_mb"))["total"] or 0
+    storage_used_gb = total_size_mb / 1024
+    uploads_total_size_gb = round(storage_used_gb, 1)
+    week_ago = timezone.now() - timedelta(days=7)
+    storage_percentage = round(
+        (storage_used_gb / account.storage_quota_gb) * 100, 1
+    ) if account.storage_quota_gb else 0
+    uploads_queued = uploads.filter(status=Upload.Status.QUEUED).count()
+    uploads_processing = uploads.filter(status=Upload.Status.PROCESSING).count()
+    uploads_total_count = uploads.count()
+    stats = {
+        "storage_used_gb": storage_used_gb,
+        "storage_quota_gb": account.storage_quota_gb,
+        "storage_percentage": storage_percentage,
+        "uploads_total_size_gb": uploads_total_size_gb,
+        "uploads_total_count": uploads_total_count,
+        "uploads_queued": uploads_queued,
+        "uploads_processing": uploads_processing,
+        "recent_activity_count": uploads.filter(updated_at__gte=week_ago).count(),
+        "uploads_complete": uploads.filter(status=Upload.Status.SYNCED).count(),
+        "links_ready": uploads.filter(has_public_link=True).count(),
+        "security_profile": account.security_profile,
+        "plan_name": account.plan_name,
+        "recent_uploads": uploads.order_by("-updated_at")[:3],
+    }
+    return render(request, "dashboard.html", {"account": account, "stats": stats})
 
 
 def logout_view(request):

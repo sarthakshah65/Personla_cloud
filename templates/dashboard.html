@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+ 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GRID | Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -30,18 +30,20 @@
   <main class="dashboard">
     <section class="panel hero-panel">
       <div>
-        <p class="eyebrow">Private Cloud Dashboard</p>
+        <p class="eyebrow">{{ stats.plan_name }} dashboard</p>
         <h1>Live activity, secure uploads, no distractions.</h1>
         <p>Track your uploads, share links, and monitor the sync queue in one clean space.</p>
       </div>
       <div class="hero-stats">
-        <div>
+        <div class="hero-stat-card">
           <p class="stat-label">Storage used</p>
-          <strong>28.3 GB</strong>
+          <strong>{{ stats.storage_used_gb|floatformat:1 }} GB</strong>
+          <p class="sub">of {{ stats.storage_quota_gb }} GB quota ({{ stats.storage_percentage }}%)</p>
         </div>
-        <div>
+        <div class="hero-stat-card">
           <p class="stat-label">Recent activity</p>
-          <strong>7 items</strong>
+          <strong>{{ stats.recent_activity_count }} items</strong>
+          <p class="sub">Last 7 days</p>
         </div>
       </div>
     </section>
@@ -49,49 +51,41 @@
     <section class="panel cards">
       <article>
         <p class="card-label">Uploads complete</p>
-        <h3>128</h3>
+        <h3>{{ stats.uploads_complete }}</h3>
         <p>Synced across devices in the last 24h.</p>
       </article>
       <article>
         <p class="card-label">Links ready</p>
-        <h3>42</h3>
+        <h3>{{ stats.links_ready }}</h3>
         <p>Expiring URLs still in circulation.</p>
       </article>
       <article>
         <p class="card-label">Security</p>
-        <h3>256-bit</h3>
+        <h3>{{ stats.security_profile }}</h3>
         <p>Every file encrypted by default.</p>
       </article>
     </section>
 
-    <section class="panel upload-area">
+    <section class="panel upload-area modern-panel">
       <div class="panel-head">
         <h2>Upload data</h2>
-        <p>Drop metadata manually for testing before the full uploader is wired up.</p>
+        <p>Share the essentials quickly with a single action.</p>
       </div>
-      <form class="upload-form">
-        <label>
-          <span>Title</span>
-          <input type="text" placeholder="designs.zip" />
-        </label>
-        <label>
-          <span>Type</span>
-          <input type="text" placeholder="Archive, Photo, Doc..." />
-        </label>
-        <label>
-          <span>Visibility</span>
-          <select>
-            <option>Private</option>
-            <option>Team share</option>
-            <option>Public link</option>
-          </select>
-        </label>
-        <label>
-          <span>Notes</span>
-          <textarea rows="3" placeholder="Quick summary or reminder"></textarea>
-        </label>
-        <button class="btn-primary" type="button">Stage upload</button>
-      </form>
+      <div class="upload-stage compact">
+        <div class="upload-drop-zone">
+          <p>Drop files here or click to browse</p>
+          <span class="supported-files">Supports .zip · .psd · .pdf · .docx · Max 5 GB</span>
+        </div>
+        <form class="upload-form minimal" aria-label="Simple upload form">
+          <label class="upload-title">
+            <span>Title</span>
+            <input type="text" placeholder="designs.zip" />
+          </label>
+          <div class="upload-actions">
+            <button class="btn-primary" type="button">Upload file</button>
+          </div>
+        </form>
+      </div>
     </section>
 
     <section class="panel uploads-list">
@@ -99,27 +93,39 @@
         <h2>Recent uploads</h2>
         <p>Visible to you only.</p>
       </div>
-      <div class="upload-row">
-        <div>
-          <p class="label">designs_v2.psd</p>
-          <p class="sub">Photos · Private · Synced 3 minutes ago</p>
+      {% if stats.recent_uploads %}
+        <div class="uploads-table-head">
+          <span>File</span>
+          <span>Details</span>
+          <span>Status</span>
         </div>
-        <span class="status success">Synced</span>
-      </div>
-      <div class="upload-row">
-        <div>
-          <p class="label">backup_dec23.zip</p>
-          <p class="sub">Archive · Team share · Pending transfer</p>
-        </div>
-        <span class="status warning">Queued</span>
-      </div>
-      <div class="upload-row">
-        <div>
-          <p class="label">notes.pdf</p>
-          <p class="sub">Doc · Private · Synced 18 minutes ago</p>
-        </div>
-        <span class="status success">Synced</span>
-      </div>
+        {% for upload in stats.recent_uploads %}
+          <div class="upload-row modern">
+            <div class="upload-info">
+              <p class="label">{{ upload.title }}</p>
+              <p class="sub">{{ upload.category }} &middot; {{ upload.visibility_label }}</p>
+            </div>
+            <div class="upload-meta">
+              <a class="upload-detail-link" href="#">
+                <span>
+                  {{ upload.size_mb }} MB
+                  {% if upload.synced_at %}
+                    &middot; Synced {{ upload.synced_at|timesince }} ago
+                  {% else %}
+                    &middot; Awaiting sync
+                  {% endif %}
+                </span>
+                {% if upload.has_public_link %}
+                  <span class="sub accent">Public link live</span>
+                {% endif %}
+              </a>
+            </div>
+            <span class="status {{ upload.status_css_class }}">{{ upload.status_label }}</span>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="sub">No uploads yet. Stage one above to get started.</p>
+      {% endif %}
     </section>
   </main>
 </body>
