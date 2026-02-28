@@ -5,6 +5,7 @@ from django.db import IntegrityError
 from django.db.models import Sum
 from django.shortcuts import redirect, render
 from django.utils import timezone
+from django.views.decorators.cache import never_cache
 
 from .models import Account, Upload
 
@@ -90,6 +91,7 @@ def auth_page(request):
     return render(request, "auth.html", context)
 
 
+@never_cache
 def dashboard(request):
     account = _get_authenticated_account(request)
     if not account:
