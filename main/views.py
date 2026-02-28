@@ -185,5 +185,6 @@ def dashboard(request):
 
 
 def logout_view(request):
+    print("Hello world")
     request.session.pop("account_id", None)
     return redirect("auth_page")
