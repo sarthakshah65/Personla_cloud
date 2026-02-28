@@ -31,6 +31,7 @@ class Upload(models.Model):
     account = models.ForeignKey(Account, related_name="uploads", on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     category = models.CharField(max_length=64)
+    file = models.FileField(upload_to="uploads/%Y/%m/%d", null=True, blank=True)
     visibility = models.CharField(max_length=16, choices=Visibility.choices, default=Visibility.PRIVATE)
     status = models.CharField(max_length=16, choices=Status.choices, default=Status.QUEUED)
     size_mb = models.PositiveIntegerField()

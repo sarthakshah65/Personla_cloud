@@ -71,21 +71,77 @@
         <h2>Upload data</h2>
         <p>Share the essentials quickly with a single action.</p>
       </div>
-      <div class="upload-stage compact">
+      <form
+        class="upload-stage compact upload-form minimal"
+        method="post"
+        enctype="multipart/form-data"
+        aria-label="Upload form"
+      >
+        {% csrf_token %}
+        {% if stats.upload_errors %}
+          <ul class="upload-error-list">
+            {% for error in stats.upload_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        {% if messages %}
+          <ul class="message-list">
+            {% for message in messages %}
+              <li class="message {{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
         <div class="upload-drop-zone">
-          <p>Drop files here or click to browse</p>
+          <label class="upload-drop-label">
+            <input
+              type="file"
+              name="file"
+              class="upload-file-input"
+              accept=".zip,.psd,.pdf,.docx"
+            />
+            <p>Drop files here or click to browse</p>
+          </label>
           <span class="supported-files">Supports .zip · .psd · .pdf · .docx · Max 5 GB</span>
         </div>
-        <form class="upload-form minimal" aria-label="Simple upload form">
-          <label class="upload-title">
-            <span>Title</span>
-            <input type="text" placeholder="designs.zip" />
-          </label>
-          <div class="upload-actions">
-            <button class="btn-primary" type="button">Upload file</button>
+        <label class="upload-title">
+          <span>Title</span>
+          <input
+            type="text"
+            name="title"
+            placeholder="designs.zip"
+            value="{{ stats.upload_form_data.title }}"
+          />
+        </label>
+        <label class="upload-title">
+          <span>Category</span>
+          <input
+            type="text"
+            name="category"
+            placeholder="Designs"
+            value="{{ stats.upload_form_data.category }}"
+          />
+        </label>
+        <label class="upload-visibility">
+          <span>Visibility</span>
+          <div class="upload-visibility-options">
+            {% for value,label in stats.visibility_choices %}
+              <label class="upload-visibility-option">
+                <input
+                  type="radio"
+                  name="visibility"
+                  value="{{ value }}"
+                  {% if value == stats.upload_form_data.visibility %}checked{% endif %}
+                />
+                <span>{{ label }}</span>
+              </label>
+            {% endfor %}
           </div>
-        </form>
-      </div>
+        </label>
+        <div class="upload-actions">
+          <button class="btn-primary" type="submit">Upload file</button>
+        </div>
+      </form>
     </section>
 
     <section class="panel uploads-list">

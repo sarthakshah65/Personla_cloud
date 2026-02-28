@@ -9,6 +9,49 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{% static 'styles.css' %}" />
+  <style>
+    body {
+      background: radial-gradient(circle at 20% 10%, rgba(66, 214, 255, 0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 90% 20%, rgba(144, 255, 159, 0.04) 0%, transparent 45%),
+                  #030606;
+      color: #f6f6f6;
+    }
+
+    .site-header {
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 1.2rem;
+    }
+
+    .nav-actions .btn {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.05);
+      color: #f6f6f6;
+    }
+
+    .nav-actions .btn-primary {
+      border-color: transparent;
+      background: linear-gradient(140deg, #42b3ff, #7adcff);
+      color: #030606;
+    }
+
+    .hero,
+    .features,
+    .personal {
+      color: #f6f6f6;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.6);
+    }
+
+    .personal {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
 </head>
 <body>
   <div class="bg-orb orb-a"></div>

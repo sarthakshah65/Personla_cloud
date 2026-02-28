@@ -1,3 +1,4 @@
+import math
 from datetime import timedelta
 
 from django.contrib.auth.hashers import check_password, make_password
@@ -6,8 +7,11 @@ from django.db.models import Sum
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
+from django.contrib import messages
 
 from .models import Account, Upload
+
+MAX_UPLOAD_SIZE_BYTES = 5 * 1024 * 1024 * 1024
 
 
 def _get_authenticated_account(request):
@@ -96,6 +100,58 @@ def dashboard(request):
     account = _get_authenticated_account(request)
     if not account:
         return redirect("auth_page")
+
+    upload_errors = []
+    upload_form_data = {
+        "title": "",
+        "category": "",
+        "visibility": Upload.Visibility.PRIVATE,
+    }
+
+    if request.method == "POST":
+        file_obj = request.FILES.get("file")
+        title = request.POST.get("title", "").strip()
+        category = request.POST.get("category", "").strip()
+        visibility = request.POST.get("visibility") or Upload.Visibility.PRIVATE
+        visibility_choices = {choice[0] for choice in Upload.Visibility.choices}
+
+        if not file_obj:
+            upload_errors.append("Choose a file to upload.")
+        if not title and file_obj:
+            title = file_obj.name
+        if not title:
+            upload_errors.append("Provide a title for the upload.")
+        elif len(title) < 3:
+            upload_errors.append("Title must be at least 3 characters.")
+        if len(category) > 64:
+            upload_errors.append("Category must be 64 characters or fewer.")
+        if visibility not in visibility_choices:
+            visibility = Upload.Visibility.PRIVATE
+        if file_obj and file_obj.size > MAX_UPLOAD_SIZE_BYTES:
+            upload_errors.append("Files must be 5 GB or smaller.")
+
+        upload_form_data = {
+            "title": title,
+            "category": category,
+            "visibility": visibility,
+        }
+
+        if not upload_errors:
+            size_mb = max(1, math.ceil(file_obj.size / (1024 * 1024)))
+            now = timezone.now()
+            upload = Upload.objects.create(
+                account=account,
+                title=title,
+                category=category or "General",
+                visibility=visibility,
+                size_mb=size_mb,
+                file=file_obj,
+                status=Upload.Status.SYNCED,
+                synced_at=now,
+            )
+            messages.success(request, f'"{upload.title}" is synced and ready.')
+            return redirect("dashboard")
+
     uploads = account.uploads.all()
     total_size_mb = uploads.aggregate(total=Sum("size_mb"))["total"] or 0
     storage_used_gb = total_size_mb / 1024
@@ -121,6 +177,9 @@ def dashboard(request):
         "security_profile": account.security_profile,
         "plan_name": account.plan_name,
         "recent_uploads": uploads.order_by("-updated_at")[:3],
+        "upload_errors": upload_errors,
+        "upload_form_data": upload_form_data,
+        "visibility_choices": Upload.Visibility.choices,
     }
     return render(request, "dashboard.html", {"account": account, "stats": stats})
 
