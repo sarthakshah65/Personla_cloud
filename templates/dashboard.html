@@ -1,0 +1,188 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GRID | Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'dashboard.css' %}" />
+</head>
+<body>
+  <div class="dashboard-bg orb-one"></div>
+  <div class="dashboard-bg orb-two"></div>
+
+  <header class="dashboard-header">
+    <div class="brand">GRID</div>
+    <nav class="nav-links">
+      <span class="nav-user">{{ account.full_name }}</span>
+      <a class="nav-link" href="{% url 'landing_page' %}">Home</a>
+      <a class="nav-link secondary" href="#">Help</a>
+    </nav>
+    <div class="header-actions">
+      <a class="btn-square secondary" href="{% url 'logout' %}">Log out</a>
+      <button class="btn-square">Upload</button>
+    </div>
+  </header>
+
+  <main class="dashboard">
+    <section class="panel hero-panel">
+      <div>
+        <p class="eyebrow">{{ stats.plan_name }} dashboard</p>
+        <h1>Live activity, secure uploads, no distractions.</h1>
+        <p>Track your uploads, share links, and monitor the sync queue in one clean space.</p>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat-card">
+          <p class="stat-label">Storage used</p>
+          <strong>{{ stats.storage_used_gb|floatformat:1 }} GB</strong>
+          <p class="sub">of {{ stats.storage_quota_gb }} GB quota ({{ stats.storage_percentage }}%)</p>
+        </div>
+        <div class="hero-stat-card">
+          <p class="stat-label">Recent activity</p>
+          <strong>{{ stats.recent_activity_count }} items</strong>
+          <p class="sub">Last 7 days</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel cards">
+      <article>
+        <p class="card-label">Uploads complete</p>
+        <h3>{{ stats.uploads_complete }}</h3>
+        <p>Synced across devices in the last 24h.</p>
+      </article>
+      <article>
+        <p class="card-label">Links ready</p>
+        <h3>{{ stats.links_ready }}</h3>
+        <p>Expiring URLs still in circulation.</p>
+      </article>
+      <article>
+        <p class="card-label">Security</p>
+        <h3>{{ stats.security_profile }}</h3>
+        <p>Every file encrypted by default.</p>
+      </article>
+    </section>
+
+    <section class="panel upload-area modern-panel">
+      <div class="panel-head">
+        <h2>Upload data</h2>
+        <p>Share the essentials quickly with a single action.</p>
+      </div>
+      <form
+        class="upload-stage compact upload-form minimal"
+        method="post"
+        enctype="multipart/form-data"
+        aria-label="Upload form"
+      >
+        {% csrf_token %}
+        {% if stats.upload_errors %}
+          <ul class="upload-error-list">
+            {% for error in stats.upload_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        {% if messages %}
+          <ul class="message-list">
+            {% for message in messages %}
+              <li class="message {{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        <div class="upload-drop-zone">
+          <label class="upload-drop-label">
+            <input
+              type="file"
+              name="file"
+              class="upload-file-input"
+              accept=".zip,.psd,.pdf,.docx"
+            />
+            <p>Drop files here or click to browse</p>
+          </label>
+          <span class="supported-files">Supports .zip · .psd · .pdf · .docx · Max 5 GB</span>
+        </div>
+        <label class="upload-title">
+          <span>Title</span>
+          <input
+            type="text"
+            name="title"
+            placeholder="designs.zip"
+            value="{{ stats.upload_form_data.title }}"
+          />
+        </label>
+        <label class="upload-title">
+          <span>Category</span>
+          <input
+            type="text"
+            name="category"
+            placeholder="Designs"
+            value="{{ stats.upload_form_data.category }}"
+          />
+        </label>
+        <label class="upload-visibility">
+          <span>Visibility</span>
+          <div class="upload-visibility-options">
+            {% for value,label in stats.visibility_choices %}
+              <label class="upload-visibility-option">
+                <input
+                  type="radio"
+                  name="visibility"
+                  value="{{ value }}"
+                  {% if value == stats.upload_form_data.visibility %}checked{% endif %}
+                />
+                <span>{{ label }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        </label>
+        <div class="upload-actions">
+          <button class="btn-primary" type="submit">Upload file</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel uploads-list">
+      <div class="panel-head">
+        <h2>Recent uploads</h2>
+        <p>Visible to you only.</p>
+      </div>
+      {% if stats.recent_uploads %}
+        <div class="uploads-table-head">
+          <span>File</span>
+          <span>Details</span>
+          <span>Status</span>
+        </div>
+        {% for upload in stats.recent_uploads %}
+          <div class="upload-row modern">
+            <div class="upload-info">
+              <p class="label">{{ upload.title }}</p>
+              <p class="sub">{{ upload.category }} &middot; {{ upload.visibility_label }}</p>
+            </div>
+            <div class="upload-meta">
+              <a class="upload-detail-link" href="#">
+                <span>
+                  {{ upload.size_mb }} MB
+                  {% if upload.synced_at %}
+                    &middot; Synced {{ upload.synced_at|timesince }} ago
+                  {% else %}
+                    &middot; Awaiting sync
+                  {% endif %}
+                </span>
+                {% if upload.has_public_link %}
+                  <span class="sub accent">Public link live</span>
+                {% endif %}
+              </a>
+            </div>
+            <span class="status {{ upload.status_css_class }}">{{ upload.status_label }}</span>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="sub">No uploads yet. Stage one above to get started.</p>
+      {% endif %}
+    </section>
+  </main>
+</body>
+</html>

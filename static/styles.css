@@ -1,13 +1,13 @@
 ﻿:root {
-  --bg: #08141e;
-  --panel: #102434;
-  --panel-soft: #163248;
-  --text: #e8f4ff;
-  --muted: #aac8de;
-  --accent: #42d6ff;
-  --accent-2: #90ff9f;
-  --line: #2c4a60;
-  --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  --bg: #030303;
+  --panel: #0c0c0c;
+  --panel-soft: #141414;
+  --text: #f6f6f6;
+  --muted: #b5b5b5;
+  --accent: #ffffff;
+  --accent-2: #c5c5c5;
+  --line: rgba(255, 255, 255, 0.08);
+  --shadow: 0 25px 45px rgba(0, 0, 0, 0.6);
 }
 
 * {
@@ -19,8 +19,8 @@
 body {
   font-family: 'Manrope', sans-serif;
   color: var(--text);
-  background: radial-gradient(circle at 20% 10%, #12324c 0%, transparent 45%),
-              radial-gradient(circle at 90% 20%, #1b3b4f 0%, transparent 40%),
+  background: radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 90% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
               var(--bg);
   min-height: 100vh;
   overflow-x: hidden;
@@ -45,7 +45,7 @@ main {
   font-weight: 700;
   font-size: 1.28rem;
   letter-spacing: 0.26rem;
-  background: linear-gradient(120deg, var(--accent), #7af8ff 50%, var(--accent-2));
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -96,8 +96,8 @@ h1 {
 }
 
 .btn-primary {
-  color: #03202e;
-  background: linear-gradient(120deg, var(--accent), #7af8ff);
+  color: #050505;
+  background: #ffffff;
   box-shadow: var(--shadow);
 }
 
@@ -108,7 +108,7 @@ h1 {
 .btn-ghost {
   color: var(--text);
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 .btn-ghost:hover {
@@ -127,7 +127,7 @@ h1 {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 0.35rem 0.75rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .features {
@@ -138,7 +138,7 @@ h1 {
 }
 
 .card {
-  background: linear-gradient(180deg, var(--panel), var(--panel-soft));
+  background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--line);
   border-radius: 1rem;
   padding: 1.2rem;
@@ -158,8 +158,8 @@ h1 {
 
 .personal {
   margin: 3.2rem 0 4.2rem;
-  background: linear-gradient(180deg, #13344d, #0f2a3d);
-  border: 1px solid #3a5d76;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--line);
   border-radius: 1rem;
   padding: 1.4rem;
   max-width: 720px;
@@ -194,7 +194,7 @@ h1 {
 .orb-a {
   width: 300px;
   height: 300px;
-  background: rgba(66, 214, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
   top: -90px;
   left: -80px;
 }
@@ -202,7 +202,7 @@ h1 {
 .orb-b {
   width: 260px;
   height: 260px;
-  background: rgba(144, 255, 159, 0.12);
+  background: rgba(255, 255, 255, 0.04);
   bottom: -80px;
   right: -70px;
 }
