@@ -144,41 +144,70 @@
       </form>
     </section>
 
-    <section class="panel uploads-list">
+    <section class="panel uploads-list modern-uploads">
       <div class="panel-head">
-        <h2>Recent uploads</h2>
-        <p>Visible to you only.</p>
+        <div>
+          <h2>Recent uploads</h2>
+          <p>Visible to you only.</p>
+        </div>
+        {% if stats.recent_uploads %}
+          <span class="sub muted">Showing {{ stats.recent_uploads|length }} items</span>
+        {% endif %}
       </div>
       {% if stats.recent_uploads %}
-        <div class="uploads-table-head">
-          <span>File</span>
-          <span>Details</span>
-          <span>Status</span>
-        </div>
-        {% for upload in stats.recent_uploads %}
-          <div class="upload-row modern">
-            <div class="upload-info">
-              <p class="label">{{ upload.title }}</p>
-              <p class="sub">{{ upload.category }} &middot; {{ upload.visibility_label }}</p>
-            </div>
-            <div class="upload-meta">
-              <a class="upload-detail-link" href="#">
-                <span>
-                  {{ upload.size_mb }} MB
-                  {% if upload.synced_at %}
-                    &middot; Synced {{ upload.synced_at|timesince }} ago
-                  {% else %}
-                    &middot; Awaiting sync
-                  {% endif %}
-                </span>
-                {% if upload.has_public_link %}
-                  <span class="sub accent">Public link live</span>
+        <div class="uploads-grid">
+          {% for upload in stats.recent_uploads %}
+            <article class="upload-card">
+              <header class="upload-card-header">
+                <div>
+                  <p class="label">{{ upload.title }}</p>
+                  <p class="sub">{{ upload.category }} · {{ upload.visibility_label }}</p>
+                </div>
+                {% if upload.status != upload.Status.SYNCED %}
+                  <span class="status-pill {{ upload.status_css_class }}">{{ upload.status_label }}</span>
+                {% else %}
+                  <span class="status-pill success">{{ upload.status_label }}</span>
                 {% endif %}
-              </a>
-            </div>
-            <span class="status {{ upload.status_css_class }}">{{ upload.status_label }}</span>
-          </div>
-        {% endfor %}
+              </header>
+              <div class="upload-card-body">
+                <div class="upload-card-meta">
+                  <span class="meta-label">Size</span>
+                  <strong>{{ upload.size_mb }} MB</strong>
+                </div>
+                <div class="upload-card-meta">
+                  {% if upload.synced_at %}
+                    <span class="meta-label">Synced</span>
+                    <strong>{{ upload.synced_at|timesince }} ago</strong>
+                  {% else %}
+                    <span class="meta-label">Sync status</span>
+                    <strong>Awaiting sync</strong>
+                  {% endif %}
+                </div>
+                <div class="upload-card-meta">
+                  <span class="meta-label">Visibility</span>
+                  <strong>{{ upload.visibility_label }}</strong>
+                </div>
+              </div>
+              <footer class="upload-card-footer">
+                <div class="upload-link-stack">
+                  {% if upload.has_public_link %}
+                    <span class="sub accent">Public link live</span>
+                  {% endif %}
+                  <a class="upload-detail-link" href="#">
+                    Details
+                  </a>
+                </div>
+                {% if upload.file %}
+                  <a class="btn-icon" href="{% url 'download_upload' upload.pk %}" aria-label="Download {{ upload.title }}">
+                    <img src="{% static 'download-logo.svg' %}" alt="" width="20" height="20" />
+                  </a>
+                {% else %}
+                  <div class="btn-icon placeholder" aria-hidden="true"></div>
+                {% endif %}
+              </footer>
+            </article>
+          {% endfor %}
+        </div>
       {% else %}
         <p class="sub">No uploads yet. Stage one above to get started.</p>
       {% endif %}

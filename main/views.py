@@ -1,4 +1,5 @@
 import math
+import os
 from datetime import timedelta
 
 from django.contrib.auth.hashers import check_password, make_password
@@ -8,6 +9,7 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
 from django.contrib import messages
+from django.http import FileResponse, Http404
 
 from .models import Account, Upload
 
@@ -176,7 +178,7 @@ def dashboard(request):
         "links_ready": uploads.filter(has_public_link=True).count(),
         "security_profile": account.security_profile,
         "plan_name": account.plan_name,
-        "recent_uploads": uploads.order_by("-updated_at")[:3],
+        "recent_uploads": uploads.order_by("-updated_at"),
         "upload_errors": upload_errors,
         "upload_form_data": upload_form_data,
         "visibility_choices": Upload.Visibility.choices,
@@ -188,3 +190,17 @@ def logout_view(request):
     print("Hello world")
     request.session.pop("account_id", None)
     return redirect("auth_page")
+
+
+def download_upload(request, upload_id):
+    account = _get_authenticated_account(request)
+    if not account:
+        return redirect("auth_page")
+
+    upload = Upload.objects.filter(pk=upload_id, account=account).first()
+    if not upload or not upload.file:
+        raise Http404("No file found for download.")
+
+    file_handle = upload.file.open("rb")
+    filename = os.path.basename(upload.file.name)
+    return FileResponse(file_handle, as_attachment=True, filename=filename)
