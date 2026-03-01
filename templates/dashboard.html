@@ -197,13 +197,29 @@
                     Details
                   </a>
                 </div>
-                {% if upload.file %}
-                  <a class="btn-icon" href="{% url 'download_upload' upload.pk %}" aria-label="Download {{ upload.title }}">
-                    <img src="{% static 'download-logo.svg' %}" alt="" width="20" height="20" />
-                  </a>
-                {% else %}
-                  <div class="btn-icon placeholder" aria-hidden="true"></div>
-                {% endif %}
+                <div class="upload-card-actions">
+                  {% if upload.file %}
+                    <a class="btn-icon" href="{% url 'download_upload' upload.pk %}" aria-label="Download {{ upload.title }}">
+                      <img src="{% static 'download-logo.svg' %}" alt="" width="20" height="20" />
+                    </a>
+                  {% else %}
+                    <div class="btn-icon placeholder" aria-hidden="true"></div>
+                  {% endif %}
+                  <form
+                    action="{% url 'delete_upload' upload.pk %}"
+                    method="post"
+                    class="upload-delete-form"
+                  >
+                    {% csrf_token %}
+                    <button
+                      type="submit"
+                      class="btn-icon delete"
+                      aria-label="Delete {{ upload.title }}"
+                    >
+                      ×
+                    </button>
+                  </form>
+                </div>
               </footer>
             </article>
           {% endfor %}

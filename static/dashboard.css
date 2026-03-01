@@ -512,6 +512,16 @@ textarea {
   gap: 0.5rem;
 }
 
+.upload-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.upload-delete-form {
+  margin: 0;
+}
+
 .upload-link-stack {
   display: flex;
   flex-direction: column;
@@ -540,6 +550,17 @@ textarea {
 .btn-icon:hover {
   background: rgba(255, 255, 255, 0.14);
   border-color: rgba(255, 255, 255, 0.4);
+}
+
+.btn-icon.delete {
+  border-color: rgba(255, 107, 107, 0.6);
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+}
+
+.btn-icon.delete:hover {
+  background: rgba(255, 107, 107, 0.18);
+  border-color: rgba(255, 107, 107, 0.9);
 }
 
 .btn-icon.placeholder {

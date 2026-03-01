@@ -1,5 +1,7 @@
 import math
+import mimetypes
 import os
+import posixpath
 from datetime import timedelta
 
 from django.contrib.auth.hashers import check_password, make_password
@@ -8,6 +10,7 @@ from django.db.models import Sum
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.http import FileResponse, Http404
 
@@ -204,3 +207,41 @@ def download_upload(request, upload_id):
     file_handle = upload.file.open("rb")
     filename = os.path.basename(upload.file.name)
     return FileResponse(file_handle, as_attachment=True, filename=filename)
+
+
+@require_POST
+def delete_upload(request, upload_id):
+    account = _get_authenticated_account(request)
+    if not account:
+        return redirect("auth_page")
+
+    upload = Upload.objects.filter(pk=upload_id, account=account).first()
+    if not upload:
+        messages.error(request, "Upload not found.")
+        return redirect("dashboard")
+
+    if upload.file:
+        upload.file.delete(save=False)
+    title = upload.title
+    upload.delete()
+    messages.success(request, f'"{title}" has been deleted.')
+    return redirect("dashboard")
+
+
+def protected_media(request, path):
+    account = _get_authenticated_account(request)
+    if not account:
+        return redirect("auth_page")
+
+    normalized_path = posixpath.normpath(path).lstrip("/")
+    if normalized_path.startswith(".."):
+        raise Http404("File not found.")
+
+    upload = Upload.objects.filter(file=normalized_path, account=account).first()
+    if not upload or not upload.file:
+        raise Http404("File not found.")
+
+    file_handle = upload.file.open("rb")
+    filename = os.path.basename(upload.file.name)
+    content_type = mimetypes.guess_type(filename)[0] or "application/octet-stream"
+    return FileResponse(file_handle, filename=filename, content_type=content_type)
