@@ -37,8 +37,8 @@
       <div class="hero-stats">
         <div class="hero-stat-card">
           <p class="stat-label">Storage used</p>
-          <strong>{{ stats.storage_used_gb|floatformat:1 }} GB</strong>
-          <p class="sub">of {{ stats.storage_quota_gb }} GB quota ({{ stats.storage_percentage }}%)</p>
+          <strong>{{ stats.storage_used_gb|floatformat:4 }} GB</strong>
+          <p class="sub">{{ stats.storage_used_mb }} MB · of {{ stats.storage_quota_gb }} GB quota ({{ stats.storage_percentage|floatformat:3 }}%)</p>
         </div>
         <div class="hero-stat-card">
           <p class="stat-label">Recent activity</p>
@@ -98,11 +98,10 @@
               type="file"
               name="file"
               class="upload-file-input"
-              accept=".zip,.psd,.pdf,.docx"
+              accept=".mp4,.mp3,.pdf,.jpeg,.jpg,.png,.zip"
             />
-            <p>Drop files here or click to browse</p>
-          </label>
-          <span class="supported-files">Supports .zip · .psd · .pdf · .docx · Max 5 GB</span>
+         </label>
+          <span class="supported-files">Supports MP4, MP3, PDF, JPEG, JPG, PNG, and ZIP. Max 5 GB.</span>
         </div>
         <label class="upload-title">
           <span>Title</span>
