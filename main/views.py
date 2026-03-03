@@ -17,6 +17,23 @@ from django.http import FileResponse, Http404
 from .models import Account, Upload
 
 MAX_UPLOAD_SIZE_BYTES = 5 * 1024 * 1024 * 1024
+ALLOWED_FILE_EXTENSIONS = {
+    ".mp4",
+    ".mp3",
+    ".pdf",
+    ".jpeg",
+    ".jpg",
+    ".png",
+    ".zip",
+}
+ALLOWED_MIME_TYPES = {
+    "video/mp4",
+    "audio/mpeg",
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "application/zip",
+}
 
 
 def _get_authenticated_account(request):
@@ -120,6 +137,17 @@ def dashboard(request):
         visibility = request.POST.get("visibility") or Upload.Visibility.PRIVATE
         visibility_choices = {choice[0] for choice in Upload.Visibility.choices}
 
+        if file_obj:
+            file_name = file_obj.name
+            file_ext = os.path.splitext(file_name)[1].lower()
+            content_type = getattr(file_obj, "content_type", "").lower()
+            if file_ext not in ALLOWED_FILE_EXTENSIONS:
+                upload_errors.append(
+                    "Only MP4, MP3, PDF, JPEG, JPG, zip and PNG files are allowed."
+                )
+            elif content_type and content_type not in ALLOWED_MIME_TYPES:
+                upload_errors.append("This file type is not supported.")
+
         if not file_obj:
             upload_errors.append("Choose a file to upload.")
         if not title and file_obj:
@@ -159,19 +187,28 @@ def dashboard(request):
 
     uploads = account.uploads.all()
     total_size_mb = uploads.aggregate(total=Sum("size_mb"))["total"] or 0
-    storage_used_gb = total_size_mb / 1024
+    storage_used_mb = total_size_mb
+    storage_used_gb = storage_used_mb / 1024
     uploads_total_size_gb = round(storage_used_gb, 1)
     week_ago = timezone.now() - timedelta(days=7)
-    storage_percentage = round(
-        (storage_used_gb / account.storage_quota_gb) * 100, 1
-    ) if account.storage_quota_gb else 0
+    storage_quota_mb = account.storage_quota_gb * 1024 if account.storage_quota_gb else 0
+    storage_percentage = (
+        round((storage_used_mb / storage_quota_mb) * 100, 3)
+        if storage_quota_mb
+        else 0
+    )
     uploads_queued = uploads.filter(status=Upload.Status.QUEUED).count()
     uploads_processing = uploads.filter(status=Upload.Status.PROCESSING).count()
     uploads_total_count = uploads.count()
+    allowed_file_types_display = ", ".join(
+        ext.upper().lstrip(".") for ext in sorted(ALLOWED_FILE_EXTENSIONS)
+    )
+
     stats = {
         "storage_used_gb": storage_used_gb,
         "storage_quota_gb": account.storage_quota_gb,
         "storage_percentage": storage_percentage,
+        "storage_used_mb": storage_used_mb,
         "uploads_total_size_gb": uploads_total_size_gb,
         "uploads_total_count": uploads_total_count,
         "uploads_queued": uploads_queued,
@@ -185,6 +222,7 @@ def dashboard(request):
         "upload_errors": upload_errors,
         "upload_form_data": upload_form_data,
         "visibility_choices": Upload.Visibility.choices,
+        "allowed_file_types": allowed_file_types_display,
     }
     return render(request, "dashboard.html", {"account": account, "stats": stats})
 
